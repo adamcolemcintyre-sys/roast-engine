@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Roast Engine 🔥</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #080808;
+      --surface: #111111;
+      --surface2: #1a1a1a;
+      --border: #222222;
+      --accent: #ff4500;
+      --accent2: #ff6a00;
+      --text: #f0f0f0;
+      --muted: #666;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 60px 20px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(255,69,0,0.1);
+      border: 1px solid rgba(255,69,0,0.3);
+      color: var(--accent);
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 100px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 4rem;
+      font-weight: 800;
+      letter-spacing: -2px;
+      line-height: 1;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #fff 0%, #999 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 1rem;
+      font-weight: 300;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 680px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 16px;
+    }
+
+    .card-label {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .categories {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .cat-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 10px;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .cat-btn .icon { font-size: 1.4rem; display: block; margin-bottom: 6px; }
+
+    .cat-btn:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .cat-btn.active {
+      border-color: var(--accent);
+      background: rgba(255,69,0,0.08);
+      color: var(--text);
+    }
+
+    textarea {
+      width: 100%;
+      height: 180px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      color: var(--text);
+      font-size: 0.95rem;
+      font-family: 'Inter', sans-serif;
+      resize: vertical;
+      transition: border-color 0.15s;
+      line-height: 1.6;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    textarea::placeholder { color: var(--muted); }
+
+    .roast-btn {
+      width: 100%;
+      max-width: 680px;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: 'Syne', sans-serif;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.15s;
+      margin-bottom: 32px;
+    }
+
+    .roast-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .roast-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    .result-card {
+      width: 100%;
+      max-width: 680px;
+      display: none;
+    }
+
+    .score-row {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px 32px;
+      margin-bottom: 16px;
+    }
+
+    .score-circle {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 3px solid var(--accent);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .score-number {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    .score-label {
+      font-size: 0.6rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .score-verdict {
+      flex: 1;
+    }
+
+    .score-verdict h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .score-verdict p {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .roast-output {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 32px;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .roast-text {
+      font-size: 0.95rem;
+      line-height: 1.8;
+      color: var(--text);
+      margin-bottom: 24px;
+    }
+
+    .redemption-text {
+      font-size: 0.95rem;
+      line-height: 1.8;
+      color: #aaa;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 24px 0;
+    }
+
+    .share-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-size: 0.9rem;
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      letter-spacing: 0.5px;
+    }
+
+    .share-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    #shareCanvas { display: none; }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 2.8rem; }
+      .categories { grid-template-columns: repeat(2, 1fr); }
+      .card { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="badge">AI Powered</div>
+    <h1>Roast Engine</h1>
+    <p class="subtitle">Paste anything. Get destroyed. Actually improve.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Choose Category</div>
+    <div class="categories">
+      <div class="cat-btn active" data-type="CV / Resume" onclick="selectCat(this)">
+        <span class="icon">📄</span> CV / Resume
+      </div>
+      <div class="cat-btn" data-type="Dating Profile" onclick="selectCat(this)">
+        <span class="icon">💘</span> Dating Profile
+      </div>
+      <div class="cat-btn" data-type="Business Idea" onclick="selectCat(this)">
+        <span class="icon">💡</span> Business Idea
+      </div>
+      <div class="cat-btn" data-type="LinkedIn Bio" onclick="selectCat(this)">
+        <span class="icon">💼</span> LinkedIn Bio
+      </div>
+      <div class="cat-btn" data-type="Instagram Bio" onclick="selectCat(this)">
+        <span class="icon">📸</span> Instagram Bio
+      </div>
+      <div class="cat-btn" data-type="Startup Pitch" onclick="selectCat(this)">
+        <span class="icon">🚀</span> Startup Pitch
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Paste Your Text</div>
+    <textarea id="userInput" placeholder="Drop it here. Don't be shy."></textarea>
+  </div>
+
+  <button class="roast-btn" id="roastBtn" onclick="getRoast()">🔥 Roast Me</button>
+
+  <div class="result-card" id="resultCard">
+
+    <div class="score-row">
+      <div class="score-circle">
+        <div class="score-number" id="scoreNum">--</div>
+        <div class="score-label">/ 100</div>
+      </div>
+      <div class="score-verdict">
+        <h3 id="verdictTitle">--</h3>
+        <p id="verdictSub">--</p>
+      </div>
+    </div>
+
+    <div class="roast-output">
+      <div class="section-title">🔥 The Roast</div>
+      <div class="roast-text" id="roastText"></div>
+      <div class="divider"></div>
+      <div class="section-title">✨ Redemption Arc</div>
+      <div class="redemption-text" id="redemptionText"></div>
+    </div>
+
+    <button class="share-btn" onclick="shareResult()">Share My Roast 🔥</button>
+
+  </div>
+
+  <canvas id="shareCanvas"></canvas>
+
+  <script>
+    let selectedType = "CV / Resume";
+    let currentData = null;
+
+    function selectCat(el) {
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+      selectedType = el.dataset.type;
+    }
+
+    function getVerdict(score) {
+      if (score >= 80) return { title: "Actually Pretty Good", sub: "We struggled to find things wrong. Impressive." };
+      if (score >= 60) return { title: "Decent, But Needs Work", sub: "You're not embarrassing yourself. Yet." };
+      if (score >= 40) return { title: "Mediocre at Best", sub: "This is the participation trophy of submissions." };
+      if (score >= 20) return { title: "Genuinely Concerning", sub: "We're worried about you. Seriously." };
+      return { title: "An Absolute Disaster", sub: "Delete this. Start from scratch. Never speak of it again." };
+    }
+
+    async function getRoast() {
+      const text = document.getElementById("userInput").value.trim();
+      if (!text) { alert("Paste something first."); return; }
+
+      const btn = document.getElementById("roastBtn");
+      btn.disabled = true;
+      btn.textContent = "Roasting...";
+
+      try {
+        const response = await fetch("/roast", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text, type: selectedType })
+        });
+
+        const data = await response.json();
+        currentData = data;
+
+        const verdict = getVerdict(data.score);
+        document.getElementById("scoreNum").textContent = data.score;
+        document.getElementById("verdictTitle").textContent = verdict.title;
+        document.getElementById("verdictSub").textContent = verdict.sub;
+        document.getElementById("roastText").textContent = data.roast;
+        document.getElementById("redemptionText").textContent = data.redemption;
+        document.getElementById("resultCard").style.display = "block";
+        document.getElementById("resultCard").scrollIntoView({ behavior: "smooth" });
+
+      } catch (err) {
+        alert("Something went wrong. Try again.");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "🔥 Roast Me";
+      }
+    }
+
+    function shareResult() {
+      if (!currentData) return;
+
+      const canvas = document.getElementById("shareCanvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = 1080;
+      canvas.height = 1080;
+
+      ctx.fillStyle = "#080808";
+      ctx.fillRect(0, 0, 1080, 1080);
+
+      ctx.fillStyle = "#ff4500";
+      ctx.fillRect(0, 0, 1080, 6);
+
+      ctx.beginPath();
+      ctx.arc(540, 280, 120, 0, Math.PI * 2);
+      ctx.strokeStyle = "#ff4500";
+      ctx.lineWidth = 6;
+      ctx.stroke();
+
+      ctx.fillStyle = "#ff4500";
+      ctx.font = "bold 100px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText(currentData.score, 540, 310);
+
+      ctx.fillStyle = "#666";
+      ctx.font = "28px Arial";
+      ctx.fillText("/ 100", 540, 360);
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 52px Arial";
+      ctx.fillText("Roast Engine", 540, 460);
+
+      ctx.fillStyle = "#cccccc";
+      ctx.font = "28px Arial";
+      const words = currentData.roast.split(' ');
+      let line = '';
+      let y = 540;
+      for (let word of words) {
+        const test = line + word + ' ';
+        if (ctx.measureText(test).width > 900 && line !== '') {
+          ctx.fillText(line.trim(), 540, y);
+          line = word + ' ';
+          y += 40;
+          if (y > 880) break;
+        } else {
+          line = test;
+        }
+      }
+      if (y <= 880) ctx.fillText(line.trim(), 540, y);
+
+      ctx.fillStyle = "#ff4500";
+      ctx.font = "26px Arial";
+      ctx.fillText("roastengine.app", 540, 1020);
+
+      const link = document.createElement("a");
+      link.download = "my-roast.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    }
+  </script>
+
+</body>
+</html>
